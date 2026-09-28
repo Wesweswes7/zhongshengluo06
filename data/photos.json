@@ -15,8 +15,9 @@
       "zh": "罗中圣身穿黑色 T 恤站在水畔，身后是绿树与几何造型的建筑。"
     },
     "image": "/images/photos/by-the-water",
-    "width": 1448,
-    "height": 1086
+    "width": 5824,
+    "height": 4368,
+    "responsiveWidths": [640, 1080, 1920, 2880, 3840]
   },
   {
     "slug": "at-the-podium",
@@ -35,6 +36,7 @@
     },
     "image": "/images/photos/at-the-podium",
     "width": 1086,
-    "height": 1448
+    "height": 1448,
+    "responsiveWidths": [640, 1080]
   }
 ]

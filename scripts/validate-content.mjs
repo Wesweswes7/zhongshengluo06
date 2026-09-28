@@ -91,7 +91,21 @@ for (const photo of read('photos')) {
       /^\/images\/photos\/[a-z0-9-]+$/.test(photo.image),
     `Photo ${photo.slug}: invalid image prefix`,
   );
-  for (const suffix of ['.jpg', '-640.webp', '-1080.webp'])
+  assert(
+    Array.isArray(photo.responsiveWidths) &&
+      photo.responsiveWidths.length > 0 &&
+      photo.responsiveWidths.every(
+        (width, index, widths) =>
+          Number.isInteger(width) &&
+          width > 0 &&
+          (index === 0 || width > widths[index - 1]),
+      ),
+    `Photo ${photo.slug}: responsiveWidths must be unique, ascending positive integers`,
+  );
+  for (const suffix of [
+    '.jpg',
+    ...photo.responsiveWidths.map((width) => `-${width}.webp`),
+  ])
     assert(
       fs.existsSync(path.join(root, 'public', `${photo.image}${suffix}`)),
       `Photo ${photo.slug}: missing ${suffix} asset`,

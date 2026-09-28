@@ -184,7 +184,12 @@ export function HomePage({ lang }: { lang: Locale }) {
               .map((photo) => ({
                 id: photo.slug,
                 src: asset(`${photo.image}.jpg`),
-                srcSet: `${asset(`${photo.image}-640.webp`)} 640w, ${asset(`${photo.image}-1080.webp`)} 1080w`,
+                srcSet: photo.responsiveWidths
+                  .map(
+                    (width) =>
+                      `${asset(`${photo.image}-${width}.webp`)} ${width}w`,
+                  )
+                  .join(', '),
                 alt: photo.alt[lang],
                 caption: photo.title[lang],
                 width: photo.width,

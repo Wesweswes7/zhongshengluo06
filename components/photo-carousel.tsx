@@ -42,7 +42,11 @@ export function PhotoCarousel({
         <div className="portrait-viewport">
           <picture key={photo.id}>
             {photo.srcSet && (
-              <source type="image/webp" srcSet={photo.srcSet} sizes="100vw" />
+              <source
+                type="image/webp"
+                srcSet={photo.srcSet}
+                sizes="(max-width: 640px) 100vw, 76vw"
+              />
             )}
             <img
               src={photo.src}
