@@ -1,1 +1,21 @@
-/* System fonts keep the site fast and available without third-party font requests. */
+/*
+ * Font roles live here; size, weight and spacing tokens live in globals.css.
+ * No remote requests or unverified font-file paths: use the preferred families
+ * when installed, otherwise fall back immediately to platform sans-serif fonts.
+ * External font retrieval was unavailable during the September 2026 upgrade.
+ */
+:root {
+  --font-cjk:
+    'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', 'PingFang SC',
+    sans-serif;
+  --font-body: 'Inter', 'Segoe UI', Arial, var(--font-cjk);
+  --font-heading: 'IBM Plex Sans', 'Segoe UI', Arial, var(--font-cjk);
+  --font-mono:
+    'SFMono-Regular', Consolas, 'Liberation Mono', 'Courier New',
+    var(--font-cjk), monospace;
+}
+
+html[lang='zh-CN'] {
+  --font-body: var(--font-cjk);
+  --font-heading: var(--font-cjk);
+}
