@@ -23,10 +23,67 @@ export function PhotoCarousel({
   children?: ReactNode;
 }) {
   const [index, setIndex] = useState(0);
+  const [requested, setRequested] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const failedTarget = useRef(0);
   const carouselRef = useRef<HTMLElement>(null);
   const photo = photos[index];
-  const change = (step: number) =>
-    setIndex((current) => (current + step + photos.length) % photos.length);
+  const choose = (position: number) => {
+    setFailed(false);
+    setRequested(position);
+  };
+  const change = (step: number) => {
+    setFailed(false);
+    setRequested((current) => (current + step + photos.length) % photos.length);
+  };
+  useEffect(() => {
+    // The eager image can fail before hydration attaches its error handler.
+    const initial = carouselRef.current?.querySelector('img');
+    if (initial?.complete && initial.naturalWidth === 0) setFailed(true);
+  }, []);
+  useEffect(() => {
+    if (requested === index && retry === 0) return;
+    // Keep the current image, caption and selected dot together until the next
+    // resource has decoded. Only a user-requested photograph is fetched.
+    let cancelled = false;
+    const next = photos[requested];
+    const image = new Image();
+    const fail = () => {
+      if (cancelled) return;
+      cancelled = true;
+      failedTarget.current = requested;
+      setFailed(true);
+      setRequested(index);
+      setRetry(0);
+    };
+    const timer = window.setTimeout(fail, 12000);
+    image.onload = async () => {
+      try {
+        await image.decode();
+      } catch {
+        fail();
+        return;
+      }
+      if (cancelled) return;
+      window.clearTimeout(timer);
+      setIndex(requested);
+      setFailed(false);
+      setRetry(0);
+    };
+    image.onerror = fail;
+    if (next.srcSet) {
+      image.sizes = next.sizes ?? '(max-width: 900px) 100vw, 76vw';
+      image.srcset = next.srcSet;
+    }
+    image.src = next.src;
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      image.onload = null;
+      image.onerror = null;
+    };
+  }, [requested, index, photos, retry]);
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -97,21 +154,15 @@ export function PhotoCarousel({
       data-photo={photo.id}
       aria-roledescription={lang === 'en' ? 'carousel' : '轮播'}
       aria-label={lang === 'en' ? 'Personal photographs' : '个人照片'}
-      onKeyDown={(event) => {
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-          event.preventDefault();
-          change(event.key === 'ArrowLeft' ? -1 : 1);
-        }
-      }}
     >
       <div className="portrait-frame">
         <div className="portrait-viewport">
-          <picture key={photo.id}>
+          <picture key={`${photo.id}-${retry}`}>
             {photo.srcSet && (
               <source
                 type="image/webp"
                 srcSet={photo.srcSet}
-                sizes={photo.sizes ?? '(max-width: 640px) 100vw, 76vw'}
+                sizes={photo.sizes ?? '(max-width: 900px) 100vw, 76vw'}
               />
             )}
             <img
@@ -123,6 +174,10 @@ export function PhotoCarousel({
               loading="eager"
               decoding="async"
               className={index === 0 ? undefined : 'carousel-added'}
+              onError={() => {
+                failedTarget.current = index;
+                setFailed(true);
+              }}
             />
           </picture>
         </div>
@@ -156,6 +211,37 @@ export function PhotoCarousel({
         </g>
       </svg>
       {children}
+      <div
+        className="carousel-status container"
+        role="status"
+        aria-live="polite"
+      >
+        {failed ? (
+          <>
+            <span>
+              {lang === 'en'
+                ? 'Photo could not load. Try again or choose another.'
+                : '照片加载失败，请重试或选择其他照片。'}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setFailed(false);
+                setRequested(failedTarget.current);
+                setRetry((value) => value + 1);
+              }}
+            >
+              {lang === 'en' ? 'Retry' : '重试'}
+            </button>
+          </>
+        ) : requested !== index ? (
+          lang === 'en' ? (
+            'Loading photo…'
+          ) : (
+            '照片加载中…'
+          )
+        ) : null}
+      </div>
       <figcaption className="cover-bottom container">
         <div className="cover-caption" aria-live="polite" aria-atomic="true">
           <span>{photo.caption}</span>
@@ -168,6 +254,13 @@ export function PhotoCarousel({
           className="carousel-controls"
           role="group"
           aria-label={lang === 'en' ? 'Choose a photo' : '切换照片'}
+          aria-busy={requested !== index}
+          onKeyDown={(event) => {
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+              event.preventDefault();
+              change(event.key === 'ArrowLeft' ? -1 : 1);
+            }
+          }}
         >
           <button
             type="button"
@@ -182,7 +275,7 @@ export function PhotoCarousel({
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setIndex(position)}
+                onClick={() => choose(position)}
                 aria-label={`${lang === 'en' ? 'Photo' : '照片'} ${position + 1}: ${item.caption}`}
                 aria-pressed={index === position}
               >

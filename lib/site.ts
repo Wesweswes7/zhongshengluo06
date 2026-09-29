@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import profile from '@/data/profile.json';
+import coverPhoto from '@/data/cover-photo.json';
 import en from '@/messages/en.json';
 import zh from '@/messages/zh.json';
 import zhLabels from '@/messages/labels.zh.json';
@@ -46,6 +47,12 @@ export function metadata(
     : 'Zhongsheng Luo | AI & Computational Social Science';
   const desc =
     description ?? `${profile.intro[lang]} ${profile.interestsIntro[lang]}`;
+  const shareImage = {
+    url: absolute(`${coverPhoto.image}-share.jpg`),
+    width: 1200,
+    height: 630,
+    alt: coverPhoto.alt[lang],
+  };
   return {
     title: name,
     description: desc,
@@ -65,6 +72,13 @@ export function metadata(
       siteName: profile.englishName,
       type: 'website',
       locale: lang === 'zh' ? 'zh_CN' : 'en_US',
+      images: [shareImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: name,
+      description: desc,
+      images: [shareImage],
     },
   };
 }

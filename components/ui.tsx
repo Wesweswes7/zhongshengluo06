@@ -65,7 +65,7 @@ export function SectionHeading({
   link,
 }: {
   label: string;
-  title: string;
+  title: ReactNode;
   href?: string;
   link?: string;
 }) {

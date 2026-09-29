@@ -185,6 +185,63 @@
   gap: var(--space-2);
   flex-wrap: wrap;
   margin-top: var(--space-4);
+  max-width: min(42vw, 500px);
+}
+.carousel-status {
+  position: absolute;
+  z-index: 3;
+  bottom: calc(var(--control-size) + var(--space-4));
+  left: 0;
+  right: 0;
+  font-size: var(--text-meta);
+  pointer-events: none;
+}
+.carousel-status:not(:empty) {
+  background: var(--color-cover);
+}
+.carousel-status button {
+  min-height: var(--control-size);
+  margin-left: var(--space-2);
+  color: var(--color-surface);
+  background: transparent;
+  border: 1px solid var(--color-cover-line);
+  border-radius: var(--radius-button);
+  padding-inline: var(--space-2);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.home-experience {
+  padding-bottom: var(--space-6);
+}
+.home-experience + .contact-strip {
+  padding-block: var(--space-4) var(--space-6);
+  gap: var(--space-4);
+}
+.home-experience + .contact-strip .contact-links {
+  white-space: normal;
+  min-width: 0;
+}
+.home-experience + .contact-strip .contact-links a {
+  min-height: var(--control-size);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  overflow-wrap: anywhere;
+}
+.home-experience + .contact-strip .contact-links a:first-child {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-surface);
+}
+.home-experience + .contact-strip .contact-links a:focus-visible {
+  outline: 2px solid var(--color-primary-hover);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .home-experience + .contact-strip .contact-links a:hover {
+    border-color: var(--color-primary-hover);
+    text-decoration: underline;
+  }
 }
 /* Inverse variants are restricted to the photographic cover. */
 .cover-copy .button-primary {
@@ -355,7 +412,7 @@
     stroke-width: 2;
   }
   .home-cover .photo-carousel {
-    height: 700px;
+    height: auto;
   }
   .cover-title {
     max-width: 420px;
@@ -376,77 +433,58 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--space-3);
   }
-  /* The supplied cover stays fully visible above the text on narrow screens. */
-  .home-cover .photo-carousel[data-photo='study-portrait'] {
-    height: auto;
-  }
-  .home-cover [data-photo='study-portrait'] .portrait-frame {
+  /* All slides share one stable frame and text/control layout at this breakpoint. */
+  .home-cover .portrait-frame {
     position: relative;
     inset: auto;
   }
-  .home-cover [data-photo='study-portrait'] .portrait-viewport,
-  .home-cover [data-photo='study-portrait'] .portrait-viewport picture {
-    height: auto;
+  .home-cover .portrait-viewport {
+    aspect-ratio: 1672 / 941;
   }
+  .home-cover .portrait-viewport img,
   .home-cover [data-photo='study-portrait'] .portrait-viewport img {
     width: 100%;
     max-width: 100%;
     margin: 0;
-    height: auto;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
     object-position: center;
   }
-  .home-cover [data-photo='study-portrait'] .portrait-frame::after {
+  .home-cover [data-photo='in-the-field'] img {
+    object-position: 65% 12%;
+  }
+  .home-cover [data-photo='by-the-water'] img {
+    object-position: 50% 38%;
+  }
+  .home-cover .portrait-frame::after {
     background: none;
   }
-  .home-cover [data-photo='study-portrait'] .cover-copy {
+  .home-cover .cover-copy {
     position: relative;
     top: auto;
     bottom: auto;
     transform: none;
     padding-block: var(--space-4) var(--space-3);
   }
-  .home-cover [data-photo='study-portrait'] .cover-copy h1,
-  .home-cover [data-photo='study-portrait'] .cover-title,
-  .home-cover [data-photo='study-portrait'] .cover-affiliation {
+  .home-cover .cover-copy h1,
+  .home-cover .cover-title,
+  .home-cover .cover-affiliation,
+  .home-cover .hero-actions {
     max-width: 100%;
   }
-  .home-cover [data-photo='study-portrait'] .cover-bottom {
+  .home-cover .cover-bottom {
     position: relative;
     bottom: auto;
     padding-bottom: var(--space-3);
+  }
+  .cover-caption {
+    min-height: 2lh;
   }
 }
 @media (max-width: 640px) {
   /* The conference crop has another face near this corner. Keep it clear. */
   .home-cover [data-photo='in-the-field'] .cover-network {
     display: none;
-  }
-  .home-cover .photo-carousel {
-    height: 690px;
-  }
-  .home-cover .portrait-viewport img {
-    width: 100%;
-    margin: 0;
-    object-position: 70% 30%;
-  }
-  .home-cover .portrait-frame::after {
-    background: linear-gradient(
-      0deg,
-      rgb(var(--cover-rgb) / 98%) 0%,
-      rgb(var(--cover-rgb) / 82%) 27%,
-      rgb(var(--cover-rgb) / 15%) 70%
-    );
-  }
-  .home-cover [data-photo='by-the-water'] img {
-    object-position: 50% 36%;
-    transform: translateY(-110px);
-    mask-image: linear-gradient(#000 72%, transparent 100%);
-  }
-  .cover-copy {
-    top: auto;
-    bottom: 128px;
-    transform: none;
   }
   .cover-eyebrow {
     margin-bottom: var(--space-2);

@@ -97,6 +97,7 @@ assert(
 );
 for (const suffix of [
   '.jpg',
+  '-share.jpg',
   ...(cover.responsiveWidths ?? []).map((width) => `-${width}.webp`),
 ])
   assert(

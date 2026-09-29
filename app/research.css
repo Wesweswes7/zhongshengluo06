@@ -24,6 +24,10 @@
   max-width: 19ch;
   color: var(--color-feature-text);
 }
+.home-research-phrase {
+  display: inline-block;
+  white-space: nowrap;
+}
 .home-research-navigation :is(.eyebrow, .text-link) {
   color: var(--color-feature-node);
 }

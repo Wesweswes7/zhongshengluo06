@@ -4,7 +4,7 @@
   "responsiveWidths": [640, 960, 1280, 1672],
   "width": 1672,
   "height": 941,
-  "sizes": "100vw",
+  "sizes": "(max-width: 900px) 100vw, (min-width: 1496px) 1138px, 76vw",
   "alt": {
     "en": "Zhongsheng Luo in a study-space portrait, wearing glasses and a black crew-neck T-shirt, seated behind a laptop with his chin resting on his hand",
     "zh": "学习空间中的罗中圣肖像：戴眼镜、穿黑色圆领 T 恤，坐在笔记本电脑后，用手托着下巴"

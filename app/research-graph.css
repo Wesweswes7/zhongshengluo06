@@ -234,6 +234,18 @@
   }
 }
 @media (max-width: 640px) {
+  .research-graph-navigation {
+    height: 270px;
+    min-height: 270px;
+  }
+  .research-node-link {
+    width: 44%;
+    padding: 8px 2px;
+    transform: translate(-50%, -21px);
+  }
+  .research-node-arrow {
+    top: 15px;
+  }
   .research-node-label {
     font-size: 14px;
   }

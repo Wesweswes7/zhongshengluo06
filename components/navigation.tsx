@@ -20,15 +20,19 @@ export function Navigation({
   lang,
   available,
   labels: t,
+  anchors,
 }: {
   lang: Locale;
   available: Section[];
   labels: NavigationLabels;
+  anchors: Record<string, string[]>;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const menu = useRef<HTMLDetailsElement>(null);
   const toggle = useRef<HTMLButtonElement>(null);
+  const header = useRef<HTMLElement>(null);
+  const [hash, setHash] = useState('');
   const cleanPath =
     basePath && pathname.startsWith(basePath + '/')
       ? pathname.slice(basePath.length)
@@ -39,19 +43,73 @@ export function Navigation({
   const current = rest.split('/')[0];
   const other: Locale = lang === 'en' ? 'zh' : 'en';
   useEffect(() => {
+    const syncHash = () => {
+      let id = '';
+      try {
+        id = decodeURIComponent(window.location.hash.slice(1));
+      } catch {
+        /* Invalid fragments fall back to the page. */
+      }
+      setHash(
+        (anchors[rest] ?? []).includes(id) ? `#${encodeURIComponent(id)}` : '',
+      );
+    };
+    syncHash();
+    window.addEventListener('hashchange', syncHash);
+    window.addEventListener('popstate', syncHash);
+    window.addEventListener('pageshow', syncHash);
+    return () => {
+      window.removeEventListener('hashchange', syncHash);
+      window.removeEventListener('popstate', syncHash);
+      window.removeEventListener('pageshow', syncHash);
+    };
+  }, [rest, anchors]);
+  useEffect(() => {
     setOpen(false);
     if (menu.current) menu.current.open = false;
   }, [pathname]);
   useEffect(() => {
     const close = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key !== 'Escape') return;
+      if (menu.current?.open) {
+        e.preventDefault();
+        menu.current.open = false;
+        menu.current.querySelector('summary')?.focus();
+      } else if (open) {
+        e.preventDefault();
         setOpen(false);
-        if (menu.current) menu.current.open = false;
         toggle.current?.focus();
       }
     };
+    const outside = (e: PointerEvent) => {
+      if (!(e.target instanceof Node)) return;
+      if (!menu.current?.contains(e.target) && menu.current)
+        menu.current.open = false;
+      if (!header.current?.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('keydown', close);
-    return () => document.removeEventListener('keydown', close);
+    document.addEventListener('pointerdown', outside);
+    return () => {
+      document.removeEventListener('keydown', close);
+      document.removeEventListener('pointerdown', outside);
+    };
+  }, [open]);
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 901px)');
+    const reset = () => {
+      const focused = document.activeElement;
+      if (
+        desktop.matches &&
+        focused?.closest('#mobile-navigation, .menu-toggle')
+      )
+        header.current?.querySelector<HTMLAnchorElement>('.brand')?.focus();
+      if (!desktop.matches && focused?.closest('.desktop-nav'))
+        toggle.current?.focus();
+      setOpen(false);
+      if (menu.current) menu.current.open = false;
+    };
+    desktop.addEventListener('change', reset);
+    return () => desktop.removeEventListener('change', reset);
   }, []);
   const navLink = (key: Section | 'home', mobile = false) => (
     <Link
@@ -72,7 +130,13 @@ export function Navigation({
     </Link>
   );
   return (
-    <header className="site-header">
+    <header
+      className="site-header"
+      ref={header}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpen(false);
+      }}
+    >
       <a className="skip-link" href="#main">
         {t.skip}
       </a>
@@ -117,7 +181,7 @@ export function Navigation({
         </nav>
         <div className="header-tools">
           <Link
-            href={route(other, rest)}
+            href={`${route(other, rest)}${hash}`}
             className="language-switch"
             aria-label={t.language}
             hrefLang={other === 'zh' ? 'zh-CN' : 'en'}

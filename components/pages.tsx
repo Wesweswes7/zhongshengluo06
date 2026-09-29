@@ -205,10 +205,7 @@ export function HomePage({ lang }: { lang: Locale }) {
               {profile.role[lang]}
             </p>
             <div className="hero-actions">
-              <Link
-                className="button button-primary"
-                href={route(lang, 'research')}
-              >
+              <Link className="button button-primary" href="#home-research">
                 {t.viewResearch}
                 <Arrow />
               </Link>
@@ -223,11 +220,26 @@ export function HomePage({ lang }: { lang: Locale }) {
           </div>
         </PhotoCarousel>
       </section>
-      <section className="home-research-section container">
+      <section id="home-research" className="home-research-section container">
         <div className="home-research-navigation research-graph-dark">
           <SectionHeading
             label={t.researchLabel}
-            title={t.researchHeading}
+            title={
+              lang === 'zh' &&
+              t.researchHeading === '在计算方法与社会问题之间。' ? (
+                <>
+                  <span className="home-research-phrase">
+                    {t.researchHeading.slice(0, 6)}
+                  </span>
+                  <wbr />
+                  <span className="home-research-phrase">
+                    {t.researchHeading.slice(6)}
+                  </span>
+                </>
+              ) : (
+                t.researchHeading
+              )
+            }
             href={route(lang, 'research')}
             link={t.allResearch}
           />

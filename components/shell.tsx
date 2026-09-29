@@ -5,6 +5,8 @@ import { ReadingMotion } from './reading-motion';
 import { Footer } from './ui';
 import { type Locale, asset, messages } from '@/lib/site';
 import { visibleSections } from '@/lib/content';
+import research from '@/data/research.json';
+import experience from '@/data/experience.json';
 import '@/app/globals.css';
 import '@/app/editorial.css';
 import '@/app/experience.css';
@@ -30,6 +32,11 @@ export function Document({
           lang={lang}
           available={visibleSections(lang)}
           labels={{ nav, skip, menu, close, aboutMe, language }}
+          anchors={{
+            '': ['home-name', 'home-research'],
+            research: research.map((item) => item.id),
+            experience: experience.map((item) => item.id),
+          }}
         />
         <main id="main" tabIndex={-1}>
           {children}
