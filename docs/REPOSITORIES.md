@@ -2,7 +2,7 @@
 
 Copy the two files from `github-profile/` into the root of the public profile repository `Wesweswes7/Wesweswes7`. Do this only when ready to publish the profile. Do not put the website application in that repository merely to display its README.
 
-The website source is in [Wesweswes7/zhongshengluo06](https://github.com/Wesweswes7/zhongshengluo06), renamed from `personal-website`. The deployment target is [the new project URL](https://wesweswes7.github.io/zhongshengluo06/); the rename is confirmed, while publication and live verification are in progress. GitHub redirects old repository URLs, but old Pages project URLs do not automatically redirect. Update published website links and bookmarks after the new deployment is verified.
+The website source is in [Wesweswes7/wesweswes7.github.io](https://github.com/Wesweswes7/wesweswes7.github.io). Its Pages target is [the account root URL](https://wesweswes7.github.io/). Renamed repository URLs redirect; old Pages project URLs do not automatically redirect.
 
 Keep the existing GitHub username. Use Zhongsheng Luo / 罗中圣 as the display name and a consistent photograph. Suggested bio: “Undergraduate at CCNU | Exploring AI, Machine Learning & Computational Social Science.”
 

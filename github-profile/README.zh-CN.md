@@ -29,20 +29,20 @@ C++ 有基础经验。大语言模型、AI 智能体与进阶人工智能研究�
 
 ## 仓库路线
 
-| 拟建仓库                                                           | 用途                         |
-| ------------------------------------------------------------------ | ---------------------------- |
-| [`zhongshengluo06`](https://github.com/Wesweswes7/zhongshengluo06) | 双语学术主页与内容           |
-| `machine-learning-notes`                                           | 机器学习笔记、练习与小型实验 |
-| `deep-learning-projects`                                           | 深度学习实践与项目           |
-| `algorithm-projects`                                               | 算法实现与相关项目           |
-| `computational-social-science`                                     | 社会问题、数据与计算方法     |
-| `paper-reading`                                                    | 论文阅读与思考               |
-| `course-notes`                                                     | 课程学习记录                 |
+| 拟建仓库                                                                     | 用途                         |
+| ---------------------------------------------------------------------------- | ---------------------------- |
+| [`wesweswes7.github.io`](https://github.com/Wesweswes7/wesweswes7.github.io) | 双语学术主页与内容           |
+| `machine-learning-notes`                                                     | 机器学习笔记、练习与小型实验 |
+| `deep-learning-projects`                                                     | 深度学习实践与项目           |
+| `algorithm-projects`                                                         | 算法实现与相关项目           |
+| `computational-social-science`                                               | 社会问题、数据与计算方法     |
+| `paper-reading`                                                              | 论文阅读与思考               |
+| `course-notes`                                                               | 课程学习记录                 |
 
-网站仓库已重命名为 `zhongshengluo06`，新项目网址正在部署。其余学习仓库为长期路线，实际有内容后再添加链接。
+网站仓库为 `wesweswes7.github.io`，使用账号根网址。其余学习仓库为长期路线，实际有内容后再添加链接。
 
 ## 联系
 
-[个人网站部署目标](https://wesweswes7.github.io/zhongshengluo06/) · [邮箱](mailto:2529631548@qq.com) · [GitHub](https://github.com/Wesweswes7)
+[个人网站部署目标](https://wesweswes7.github.io/) · [邮箱](mailto:2529631548@qq.com) · [GitHub](https://github.com/Wesweswes7)
 
 新站验证完成后，请更新旧 `/personal-website/` 书签；仓库改名不会自动重定向 Pages 项目网址。简历链接将在可用后补充。
