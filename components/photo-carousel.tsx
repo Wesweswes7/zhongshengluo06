@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 export type CarouselPhoto = {
   id: string;
@@ -22,11 +22,76 @@ export function PhotoCarousel({
   children?: ReactNode;
 }) {
   const [index, setIndex] = useState(0);
+  const carouselRef = useRef<HTMLElement>(null);
   const photo = photos[index];
   const change = (step: number) =>
     setIndex((current) => (current + step + photos.length) % photos.length);
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel || typeof window.matchMedia !== 'function') return;
+
+    let motion: MediaQueryList | undefined;
+    let frame = 0;
+    let lastScale = '';
+
+    const update = () => {
+      frame = 0;
+      const bounds = carousel.getBoundingClientRect();
+      const documentTop = bounds.top + window.scrollY;
+      const progress = Math.min(
+        1,
+        Math.max(0, window.scrollY / Math.max(1, documentTop + bounds.height)),
+      );
+      // Transform the picture layer, leaving each image's existing crop intact.
+      const scale = (1 + 0.03 * (1 - progress)).toFixed(5);
+      if (scale !== lastScale) {
+        carousel.style.setProperty('--cover-photo-scale', scale);
+        lastScale = scale;
+      }
+    };
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    const stop = () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      window.removeEventListener('pageshow', schedule);
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+      lastScale = '';
+      carousel.style.removeProperty('--cover-photo-scale');
+    };
+    const syncMotion = () => {
+      stop();
+      if (!motion?.matches) return;
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      window.addEventListener('pageshow', schedule);
+      update();
+    };
+
+    const cleanup = () => {
+      stop();
+      motion?.removeEventListener?.('change', syncMotion);
+    };
+
+    try {
+      motion = window.matchMedia(
+        '(min-width: 901px) and (prefers-reduced-motion: no-preference)',
+      );
+      motion.addEventListener('change', syncMotion);
+      syncMotion();
+    } catch {
+      // An unavailable enhancement must leave the photograph at its CSS default.
+      cleanup();
+    }
+    return cleanup;
+  }, []);
+
   return (
     <figure
+      ref={carouselRef}
       className="hero-figure photo-carousel"
       data-photo={photo.id}
       aria-roledescription={lang === 'en' ? 'carousel' : '轮播'}

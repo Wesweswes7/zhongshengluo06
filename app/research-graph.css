@@ -1,0 +1,119 @@
+/* One deterministic network shared by the full research feature and compact mark. */
+.research-graph {
+  --graph-surface: var(--color-surface);
+  --graph-line: var(--color-primary);
+  --graph-node: var(--color-primary-hover);
+  --graph-label: var(--color-primary);
+  --graph-accent: var(--color-accent);
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+  user-select: none;
+}
+.research-graph-dark .research-graph {
+  --graph-surface: var(--color-feature-bg);
+  --graph-line: var(--color-feature-node);
+  --graph-node: var(--color-feature-node);
+  --graph-label: var(--color-feature-text);
+  --graph-accent: var(--color-feature-accent);
+}
+.research-graph path,
+.research-graph circle {
+  vector-effect: non-scaling-stroke;
+}
+.research-graph-edge,
+.research-graph-secondary {
+  stroke: var(--graph-line);
+  stroke-width: 1;
+  opacity: 0.42;
+}
+.research-graph-secondary {
+  opacity: 0.24;
+}
+.research-graph-bridge {
+  stroke: var(--graph-node);
+  stroke-width: 1.5;
+  opacity: 0.68;
+}
+.research-graph-node {
+  fill: var(--graph-node-fill, var(--graph-surface));
+  stroke: var(--graph-node);
+  stroke-width: 1.5;
+}
+.research-graph-hub {
+  fill: var(--graph-node);
+  stroke-width: 2;
+}
+.research-graph-ring {
+  stroke: var(--graph-node);
+  stroke-width: 1;
+  opacity: 0.24;
+}
+.research-graph-center-ring {
+  stroke: var(--graph-accent);
+  stroke-width: 1;
+  opacity: 0.34;
+}
+.research-graph-center {
+  fill: var(--graph-accent);
+  stroke: var(--graph-surface);
+  stroke-width: 2;
+}
+.research-graph-label {
+  fill: var(--graph-label);
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.research-graph-group {
+  --graph-active: 0;
+  --graph-node-fill: var(--graph-surface);
+}
+:is(
+    .research-showcase,
+    .research-graph
+  )[data-active-research='artificial-intelligence']
+  .research-graph-group[data-research-group='artificial-intelligence'],
+:is(
+    .research-showcase,
+    .research-graph
+  )[data-active-research='computational-social-science']
+  .research-graph-group[data-research-group='computational-social-science'],
+:is(.research-showcase, .research-graph)[data-active-research='ai-governance']
+  .research-graph-group[data-research-group='ai-governance'] {
+  --graph-active: 1;
+  --graph-node-fill: var(--graph-node);
+}
+.research-graph-group .research-graph-edge {
+  opacity: calc(0.42 + var(--graph-active) * 0.48);
+  stroke-width: calc(1px + var(--graph-active) * 0.5px);
+}
+.research-graph-group .research-graph-bridge {
+  opacity: calc(0.68 + var(--graph-active) * 0.32);
+  stroke-width: calc(1.5px + var(--graph-active) * 0.5px);
+}
+.research-graph-group .research-graph-ring {
+  opacity: calc(0.24 + var(--graph-active) * 0.6);
+  stroke-width: calc(1px + var(--graph-active) * 0.5px);
+}
+.research-graph-group .research-graph-label {
+  font-weight: calc(500 + var(--graph-active) * 200);
+}
+.research-graph--compact {
+  max-width: 180px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .research-graph-group .research-graph-edge,
+  .research-graph-group .research-graph-bridge,
+  .research-graph-group .research-graph-ring {
+    transition:
+      opacity var(--duration-press) ease,
+      stroke-width var(--duration-press) ease;
+  }
+  .research-graph-group .research-graph-node {
+    transition: fill var(--duration-press) ease;
+  }
+}

@@ -117,59 +117,41 @@ export function EmptyState({
     </div>
   );
 }
-export function ConceptGraph() {
-  const points = [
-    [25, 52],
-    [61, 22],
-    [61, 82],
-    [100, 49],
-    [134, 12],
-    [143, 76],
-    [187, 38],
-    [189, 106],
-    [104, 110],
-  ];
-  const edges = [
-    [0, 1],
-    [0, 2],
-    [1, 3],
-    [2, 3],
-    [1, 4],
-    [3, 4],
-    [3, 5],
-    [3, 8],
-    [4, 6],
-    [5, 6],
-    [5, 7],
-    [5, 8],
-    [6, 7],
-    [7, 8],
-  ];
+export function ResearchIcon({ id }: { id: string }) {
+  // These three motifs use the same nodes and paths as the relationship graph.
+  const paths: Record<string, string> = {
+    'artificial-intelligence': 'M12 5v14M5 12h14M7 7l10 10M7 17 17 7',
+    'computational-social-science': 'm12 5 7 14H5L12 5Zm0 0v9m-7 5 7-5 7 5',
+    'ai-governance': 'm5 8 7-4 7 4v8l-7 4-7-4V8Zm0 0 7 4 7-4m-7 4v8',
+  };
   return (
     <svg
-      className="concept-graph"
+      className="research-icon"
       aria-hidden="true"
-      viewBox="0 0 220 128"
+      focusable="false"
+      viewBox="0 0 24 24"
+      width="28"
+      height="28"
       fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      {edges.map(([a, b], i) => (
-        <path
-          key={i}
-          d={`M${points[a].join(' ')}L${points[b].join(' ')}`}
-          stroke="currentColor"
-          opacity=".3"
-        />
-      ))}
-      {points.map(([x, y], i) => (
-        <circle
-          key={i}
-          cx={x}
-          cy={y}
-          r={i === 3 ? 5 : 3}
-          fill={i === 3 ? 'currentColor' : 'white'}
-          stroke="currentColor"
-        />
-      ))}
+      <path d={paths[id]} />
+      <circle
+        cx="12"
+        cy={
+          id === 'ai-governance'
+            ? '12'
+            : id === 'computational-social-science'
+              ? '14'
+              : '12'
+        }
+        r="2"
+        fill="currentColor"
+        stroke="none"
+      />
     </svg>
   );
 }

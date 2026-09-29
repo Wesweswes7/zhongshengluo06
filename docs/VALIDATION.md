@@ -1,5 +1,96 @@
 # Validation record
 
+## 计算视觉与交互体验升级 — 2026-09-29
+
+基于已有未提交的浏览交互工作继续实现。下方“本地待审核”章节保留其当时状态，属于历史记录。本节描述最终组合版本；内容数据、文字、路由、图片顺序、静态导出和 Pages 配置保持不变。
+
+### 本轮实际修改
+
+- `components/research-graph.tsx`（新增）：以原节点—路径语言扩展固定 16 节点示意图，三个组明确映射已有 research ID，标签取自原始标题；紧凑标记和主图复用同一结构。小型客户端包裹监听真实链接，跟随最新指针或键盘操作增强对应节点与路径，移开后恢复。SVG 为 `aria-hidden`，不进入键盘导航，不表示实际研究数据。
+- `app/research-graph.css`（新增）：统一浅色/深色图形，主要节点和路径默认清晰；仅增强选中组，不隐藏其他组。过渡使用 180ms 状态变量，减少动态时保留状态但取消过渡。
+- `app/research.css`（新增）：首页上方标题与关系图、下方三个研究卡片；Research 内页紧凑深色页头及三个真实方向锚点，下方长文保留浅色。761px 起三张等宽卡片，760px 及以下自然单列；主关系图在手机保留。
+- `components/pages.tsx`：组合展示区、图形及原有卡片；向真实链接添加明确的研究 ID，标签、标题和序号全部由现有数据读取。原卡片链接目标不变。
+- `components/ui.tsx`：移除被统一组件替代的旧小图形，增加三种节点/几何线性图标；不添加标签或技术能力文案。
+- `app/globals.css`：集中新增深色展示区的四个颜色变量、180ms 按压时长；Research 卡片改为细边框、白色表面和既有圆角，保留键盘焦点。Learning 等说明卡片没有新增点击行为。
+- `app/editorial.css`：Focus Strip 改用共享图形紧凑版，按钮时长引用统一变量；原照片定位、手动轮播和桌面滚动缩放保持不变。
+- `app/experience.css`：页头收紧，增加连续细轨道、清晰日期、白色细边框条目表面及当前状态；手机轨道放入外侧留白，不挤压正文。文章没有按压或悬停按钮效果。
+- `components/reading-motion.tsx`：将已实现的一次性入场选择器适配新 Research 包裹层，保留可见性、快速滚动、键盘、锚点和恢复处理。
+- `components/shell.tsx`：引入两份研究专用样式，保持服务器正文与静态输出。
+- `docs/VALIDATION.md`：本次实现、验证和复现说明。
+
+本轮原样保留上轮 `components/photo-carousel.tsx`、`components/experience-browser.tsx` 的滚动缩放、原生锚点与 BFCache 修复，最终发布包含这些已验证的未提交实现。没有添加运行时依赖、视频/序列帧、外部字体请求或虚构资源路径。Inter / IBM Plex Sans 仍是优先字体名称，实际使用设备可用的系统回退，不声称已加载对应字体文件。
+
+### 检查与证据
+
+- 修改前和最终生产构建均通过，生成 23 个静态页面；`npm run typecheck`、`npm run check:content`、`npm run format:check`、`git diff --check` 通过。项目没有 lint/test 脚本，未安装新的测试或动画框架。
+- 全站 `../audit-current.cjs computational-upgrade-all`：18 个中英文页面 × 375/768/1440px，共 54 组，通过；无横向溢出、缺图、浏览器异常、失败资源或失效内部地址。轮播和菜单保持可用。
+- 新专项及截图位于 `../previews/audit-computational-upgrade/`；原始基线只读保留。默认静态关系图、主题对比、手机可见性、真实链接与方向反馈分别核验，不以截图代替交互测试。
+- 专项最终覆盖 102 个中英文视图、110 组交互、1,520 条断言，0 失败；正常模式另抽查 640/641/760/761/900/901/1100/1101px 边界。正文、原链接与 ID 保持，浅深主题、手机图形、悬停/聚焦/恢复、减少动态及无 JavaScript 均通过；18 次禁用 JS 的预期脚本拒绝单独记录，无非预期资源或浏览器错误。最初七项失败来自审计先聚焦顶部导航造成的尚未结束的平滑滚动，改用 `focus({preventScroll:true})` 并等待状态过渡后定向复测通过；初次和重跑报告均保留，没有为测试改动产品滚动行为。
+- 最终入场与缩放复测：1440px 英文研究卡片各播放一次，560ms / 0、70、140ms 延迟；375px 中文逐条播放一次。首页桌面照片 1.03→1，手机与减少动态始终为 1；真实按钮按压 0.98、180ms 恢复，减少动态不缩放。中页刷新内容完整，原生恢复位置误差最多 1px，照片缩放与实际位置一致。见 `sequence-report.json`。
+- 定向混合输入七步通过：鼠标停在方向 A 时按 Tab 到 B，图形跟随 B；再次移动鼠标可切回 A；移出恢复现存焦点；真实点击继续原生锚点导航。375/768px、中英文图形标签无越界或节点重叠，实测标签字号约 11.61/12.51px。证据位于 `../previews/audit-research-graph-targeted/`。
+- 初始化故障四组全部通过：Research / Experience 入场 Observer、Experience ResizeObserver、Hero 媒体查询初始化失败后，正文与正常基线相同，原生链接和轮播可用，无页面异常。
+- 真实 BFCache 复测通过：先打开第一条锚点，再手动滚到第三条，离开并后退；`pageshow.persisted=true`，恢复 scrollY=498 和第三条当前状态，URL 中旧第一条 hash 不干扰阅读位置。第二、第三条锚点的前进后退也通过。
+
+### 预览与复现
+
+使用现有命令 `npm run preview -- --port 4185 --base /zhongshengluo06`。
+
+1. 打开 `http://127.0.0.1:4185/zhongshengluo06/en/`，原生滚过首屏，照片约 1.03→1；姓名、介绍及按钮始终可用。研究区鼠标悬停三张卡片或用 Tab 聚焦，观察对应图形组增强。
+2. 打开 `/zhongshengluo06/en/research/`，在深色页头的三个方向链接间悬停、Tab、Enter；图形状态关联最新操作，点击仍进入原详情锚点。切中文后重复。
+3. 打开 `/zhongshengluo06/zh/experience/#data-administration`，检查目标在导航下方立即可见；桌面向下读，索引/节点跟随，前进后退保持原生行为。375px 下文章自然单列，日期在标题上方。
+4. 开启减少动态或禁用 JavaScript 后刷新，正文和静态图形仍然完整，原生锚点可用；减少动态时关闭缩放、位移和路径过渡。
+
+录屏能力仍缺少 Playwright 所需的 `ffmpeg-1011/ffmpeg-win64.exe`，未生成视频，也未为此安装依赖。提供真实状态报告和桌面/手机截图，按以上步骤可复现。本次使用本机 Edge/Chromium 验证；真实 iOS/Safari 设备仍未实测。
+
+## 浏览交互动效（本地待审核）— 2026-09-29
+
+起点是已发布的 `577e6f2`，开始时工作树干净。保留既有视觉系统、文案、数据与摄影，只增加本轮授权的浏览反馈。以下全部为本地验证；本轮没有 commit、push 或触发 Pages 部署。
+
+### 实际文件与行为
+
+- `components/experience-browser.tsx`（新增）：接收服务器从原经历数据提取的 ID、日期、标题及原始文章 children。桌面真实锚点索引使用 `aria-current="location"` 表示当前经历；被动 scroll + rAF 跟踪阅读位置，不调用 history API、不拦截滚轮或触摸。原生 hash、前进后退、直接锚点保留；BFCache 恢复优先跟随实际阅读位置，而不是重新锁定旧 hash。
+- `app/experience.css`（新增）：240px 上限的紧凑索引与展开正文，sticky 限制在经历网格内；900px 及以下隐藏重复索引，正文自然单列。当前节点与边线变化，不降低其他文章透明度；`:target` 立即提供浅底/边线提示。没有满屏条目、人为滚动高度、空白占位或弹窗。
+- `components/pages.tsx`：仅用上述组件包裹原有 timeline，传入现有标题和日期；三条原文章的 ID、文字、顺序、日期及子结构保持不变。
+- `components/reading-motion.tsx`（新增）：小型客户端增强控制器。Research 标题、首页研究卡片、研究内页与经历条目按进入视口播放一次：16px 位移、560ms、同组间隔 70ms；瞬态 opacity 为 0.86–1，正文从未有默认隐藏状态。使用 IntersectionObserver / Web Animations API，不向服务器内容组件传递客户端渲染要求。
+- `components/photo-carousel.tsx`：仅为既有 picture 层计算桌面原生滚动进度，照片由 1.03 缩至 1。保留所有图像来源、加载属性、取景与手动轮播，不自动切图；媒体偏好变化、恢复页面与 resize 会同步状态，取消增强后恢复 scale 1。
+- `app/editorial.css`：缩放仅作用于大于 900px 且未要求减少动态的 picture 层，裁剪容器与既有 img transform 独立。两张人物照片已目视核对，姓名、介绍、按钮不参与开场动画。补齐首屏反色按钮、轮播箭头的键盘聚焦反馈与按压过渡。
+- `app/globals.css`：真实按钮与轮播控件轻按压 scale 0.98，140ms 恢复；键盘焦点有同等颜色与轮廓反馈。不使用 `transition: all`，普通说明卡片不增加按压或导航行为；减少动态模式关闭新增位移/缩放，同时关闭既有文字链接箭头的小位移。
+- `components/shell.tsx`：引入经历页局部样式和无界面增强控制器，保持原静态导出及服务器页面结构。
+- `docs/VALIDATION.md`：本轮实现、验证、复现方式和限制记录。
+
+### 可见性与恢复边界
+
+HTML 与 CSS 默认呈现全部正文。无 JavaScript、缺少增强 API、动效初始化失败时不需要等待脚本解除隐藏；动态偏好切换会取消正在播放的动画。直接目标、键盘焦点、恢复到页面中部的可见内容优先直接显示。快速滚动取消尚在播放的入场，已出现条目不因反向滚动重播。
+
+修复并实测两处边界：浏览器后退使用 BFCache 时跟随恢复视口；增强初始化异常由局部保护和清理处理，不进入 React 错误页。没有增加动画框架、媒体资源、网络服务或字体请求。
+
+### 验证记录
+
+- 最终 `npm run build`、`npm run typecheck`、`npm run check:content`、`npm run format:check` 和 `git diff --check` 通过。生产构建保持 23 个静态生成页面，继续使用原 `/zhongshengluo06` 前缀。
+- 原全站审计 `../audit-current.cjs motion-final`：18 个中英文页面 × 375/768/1440px，共 54 组；无布局溢出、缺图、控制台错误或异常资源请求，内部目的地址全部返回 200。
+- 专项 `../audit-motion.cjs` 检查首页、Research、Experience 的中英文与三个宽度，并分别测试正常动态、减少动态、关闭 JavaScript。记录真实浏览器动画帧、滚动、原生历史、锚点直达与键盘操作；报告位于 `../previews/audit-motion/report.json`，不是仅用截图证明交互。
+- 专项最终共 54 组页面、70 组交互、480 条断言，0 失败，记录到 1,892 帧实际播放状态。修正审计中把 scale 1 的单位矩阵误判为运动、把禁用 JavaScript 导致的预期脚本拒绝当成网络故障后，定向重跑全部 18 组 no-JS；原始与重跑报告及合并来源均保留。30 次明确的 no-JS 脚本 CSP 拒绝单独记录，正常页面没有非预期资源失败。
+- 原有正文、链接目标与基线比较一致；Experience 仅增加从既有数据生成的索引文字和三个本页锚点，未修改原内容。减少动态时无入场动画/滚动缩放；无 JavaScript 时正文和真实锚点可用，照片保持原尺寸。
+- 独立 BFCache 实测：1440×900，进入第一条 hash 后手动滚至第三条（scrollY=551），跳到 Research 再后退，真实触发 `pageshow.persisted=true`；恢复位置与当前索引仍为第三条，即使 URL 保留第一条 hash。第二、第三条锚点及前进后退也正常。证据：`experience-history.json`。
+- 定向增强初始化故障 4/4 通过：Research/Experience 的 ReadingMotion Observer 构造失败、Experience ResizeObserver 构造失败、Hero 动态媒体查询初始化失败；正文与正常基线一致，原生锚点与目标背景可用，首页轮播保留，无 pageerror。证据：`initialization-failures.json`。
+- 独立计数实测：1440px 英文研究三张卡片首次各调用一次 animate，往返后仍各一次；duration 为 560ms，同组 delay 为 0/70/140ms。375px 中文卡片逐条进入，分别播放一次。桌面 scrollY=0/400/1054 时照片 scale 为 1.03/1.01742/1；手机始终为 1。滚至 400px 后刷新，文字按钮立即可见，原生恢复位置后照片随当前进度显示，没有顶部开场或正文入场重播。证据：`sequence-report.json`。
+- 特意让全局所有 IntersectionObserver 都失败的极端探针会先触发 Next 自身预取模块错误；SSR 正文仍可读，但不将该探针描述为“无脚本错误”。原始结果保存在 `global-io-probe.json`，与本轮定向增强失败检查分开。
+- 数据、消息、原链接目标、路由文件、照片文件及顺序、package 依赖、Next 配置和 Pages workflow 未修改。所有 QA 脚本/截图/报告放在源码目录外，不进入部署。
+
+### 本地预览与复现
+
+预览使用已有命令 `npm run preview -- --port 4185 --base /zhongshengluo06`。
+
+1. 在 1440px 宽访问 `http://127.0.0.1:4185/zhongshengluo06/en/experience/`，缓慢向下读三条经历，左索引跟随当前项；继续滚动到页脚，索引随经历区域结束吸附。点击索引，再用浏览器后退/前进，观察 URL hash 与目标提示。
+2. 直接访问 `/zhongshengluo06/zh/experience/#data-administration`，首条立即显示于导航下方并带浅底。使用 Tab 到桌面索引，Enter 跳转；改为 375/768px 后索引隐藏，文章自然单列且仍有当前节点提示。
+3. 在首页从顶部滚过首屏，观察照片约 1.03→1 的轻缩放，文字与按钮保持静止；按住按钮可见约 0.98 的按压。手动切第二张照片仍沿用原控制方式。
+4. 缓慢进入首页研究卡片或研究内页，再向上、向下往返；同一条目只入场一次。快速滚动、刷新到中页和 Tab 聚焦时内容继续可见。
+5. 在浏览器开发工具中模拟 `prefers-reduced-motion: reduce`，或者关闭 JavaScript 后刷新；内容与锚点仍可阅读、定位，新增位移和缩放不播放。
+
+当前 Playwright 录制实测缺少 `ffmpeg-1011/ffmpeg-win64.exe`，无法生成短视频；未安装额外依赖。提供上述准确复现步骤、浏览器逐帧数据及截图，不以截图代替动态测试。本轮交互仅在本地待审核，线上仍为 `577e6f2`。
+
+本轮没有已知未完成的交互项。浏览器验证使用本机 Edge/Chromium 和指定视口模拟，未在真实 iOS/Safari 设备上实测；视频录制限制如上。
+
 ## Computational 视觉精修（本地待审核）— 2026-09-28
 
 基于下方已经完成的 Design System 工作树，只补充少量计算研究视觉细节。开始状态另存于源码目录外的 `../computational-start/`，用于区分本轮与此前累计改动；没有回滚、重做版式或改写内容。未 commit、未 push。

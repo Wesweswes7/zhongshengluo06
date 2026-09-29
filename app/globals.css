@@ -23,6 +23,10 @@
   --color-cover: rgb(var(--cover-rgb));
   --color-cover-muted: #e2e8f0;
   --color-cover-line: rgb(255 255 255 / 48%);
+  --color-feature-bg: #0b1220;
+  --color-feature-text: #e2e8f0;
+  --color-feature-node: #60a5fa;
+  --color-feature-accent: #a78bfa;
 
   /* Compatibility aliases: no independent color or font values. */
   --ink: var(--color-text);
@@ -53,6 +57,7 @@
   --radius-card: 12px;
   --shadow-card: 0 8px 24px rgb(15 23 42 / 4%);
   --duration: 0.25s;
+  --duration-press: 180ms;
 
   --text-hero: clamp(48px, 5.4vw, 72px);
   --text-page: clamp(40px, 4vw, 48px);
@@ -327,14 +332,15 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
   transition:
     background var(--duration) ease,
     border-color var(--duration) ease,
-    color var(--duration) ease;
+    color var(--duration) ease,
+    scale var(--duration-press) ease-out;
 }
 .button-primary {
   color: var(--color-surface);
   background: var(--color-primary);
   border-color: var(--color-primary);
 }
-.button-primary:hover {
+.button-primary:is(:hover, :focus-visible) {
   background: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
 }
@@ -343,8 +349,8 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
   background: transparent;
   color: var(--color-primary);
 }
-.button-secondary:hover,
-.button-light:hover {
+.button-secondary:is(:hover, :focus-visible),
+.button-light:is(:hover, :focus-visible) {
   background: var(--color-tag-bg);
   border-color: var(--color-primary-hover);
 }
@@ -357,7 +363,7 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
   font-weight: 500;
   line-height: 1.6;
 }
-.text-link:hover,
+.text-link:is(:hover, :focus-visible),
 .site-footer a:hover,
 .contact-item:hover strong {
   text-decoration: underline;
@@ -366,8 +372,23 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
 .arrow {
   transition: transform var(--duration) ease;
 }
-.text-link:hover .arrow {
+.text-link:is(:hover, :focus-visible) .arrow {
   transform: translateX(2px);
+}
+/* Physical feedback belongs only to real controls, not informational cards. */
+.menu-toggle {
+  transition: scale var(--duration-press) ease-out;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :is(.button, .menu-toggle, .carousel-controls button):active {
+    scale: 0.98;
+  }
+}
+.research-card:focus-visible {
+  border-color: var(--color-primary-hover);
+}
+.research-card:focus-visible h3 {
+  color: var(--color-primary-hover);
 }
 .section-heading {
   display: flex;
@@ -430,7 +451,7 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
   margin-top: var(--space-3);
 }
 
-/* Research remains editorial; learning provides the white surface layer. */
+/* Research links and learning summaries share spacing, not interaction. */
 .research-grid,
 .learning-grid {
   display: grid;
@@ -441,25 +462,15 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
   position: relative;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--color-border-strong);
-  padding-top: var(--space-3);
-  transition: border-color var(--duration) ease;
-}
-.research-card::before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: 0;
-  width: 5px;
-  height: 5px;
-  border: 1px solid var(--color-primary);
-  border-radius: 50%;
-  background: var(--color-bg);
-  pointer-events: none;
-  transition: border-color var(--duration) ease;
-}
-.research-card:focus-visible::before {
-  border-color: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-top-color: var(--color-primary-hover);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--duration) ease,
+    box-shadow var(--duration) ease;
 }
 .research-card h3 {
   margin-block: var(--space-2);
@@ -531,8 +542,8 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
   .research-card:hover h3 {
     color: var(--color-primary-hover);
   }
-  .research-card:hover::before {
-    border-color: var(--color-accent);
+  .research-card:hover {
+    box-shadow: 0 8px 24px rgb(37 99 235 / 9%);
   }
   .learning-card:hover {
     border-color: var(--color-border-strong);
@@ -1187,18 +1198,12 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
     grid-template-columns: 1fr;
   }
   .research-card {
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr);
-    column-gap: var(--space-2);
-  }
-  .research-card .item-number {
-    grid-row: 1 / 4;
+    padding: var(--space-3);
   }
   .research-card h3 {
-    margin-block: 0 var(--space-2);
+    margin-block: var(--space-2);
   }
   .card-bottom {
-    grid-column: 2;
     margin-top: var(--space-2);
   }
   .archive-grid {
@@ -1313,6 +1318,9 @@ html[lang='zh-CN'] :is(.eyebrow, .cover-eyebrow) {
 
 /* One motion policy covers both stylesheets, including future animations. */
 @media (prefers-reduced-motion: reduce) {
+  .text-link .arrow {
+    transform: none !important;
+  }
   html {
     scroll-behavior: auto;
   }

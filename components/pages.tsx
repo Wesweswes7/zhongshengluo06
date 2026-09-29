@@ -10,6 +10,8 @@ import categories from '@/data/categories.json';
 import publications from '@/data/publications.json';
 import photos from '@/data/photos.json';
 import { PhotoCarousel } from './photo-carousel';
+import { ExperienceBrowser } from './experience-browser';
+import { ResearchGraph, ResearchShowcase } from './research-graph';
 import {
   messages,
   asset,
@@ -29,7 +31,7 @@ import {
 import {
   Arrow,
   CV,
-  ConceptGraph,
+  ResearchIcon,
   ContactStrip,
   EmptyState,
   PageHeading,
@@ -43,10 +45,14 @@ function ResearchCards({ lang }: { lang: Locale }) {
       {research.map((item) => (
         <Link
           className="research-card"
+          data-research-id={item.id}
           href={`${route(lang, 'research')}#${item.id}`}
           key={item.id}
         >
-          <span className="item-number">{item.number}</span>
+          <div className="research-card-top">
+            <ResearchIcon id={item.id} />
+            <span className="item-number">{item.number}</span>
+          </div>
           <h3>{item.title[lang]}</h3>
           <p>{item.description[lang]}</p>
           <span className="card-bottom">
@@ -254,17 +260,33 @@ export function HomePage({ lang }: { lang: Locale }) {
             <p className="eyebrow">{t.next}</p>
             <p>{profile.next[lang]}</p>
           </div>
-          <ConceptGraph />
+          <ResearchGraph
+            compact
+            items={research.map((item) => ({
+              id: item.id,
+              title: item.title[lang],
+            }))}
+          />
         </div>
       </div>
       <section className="home-section container">
-        <SectionHeading
-          label={t.researchLabel}
-          title={t.researchHeading}
-          href={route(lang, 'research')}
-          link={t.allResearch}
-        />
-        <ResearchCards lang={lang} />
+        <ResearchShowcase className="home-research">
+          <div className="research-overview">
+            <SectionHeading
+              label={t.researchLabel}
+              title={t.researchHeading}
+              href={route(lang, 'research')}
+              link={t.allResearch}
+            />
+            <ResearchGraph
+              items={research.map((item) => ({
+                id: item.id,
+                title: item.title[lang],
+              }))}
+            />
+          </div>
+          <ResearchCards lang={lang} />
+        </ResearchShowcase>
       </section>
       <section className="learning-band">
         <div className="home-section container">
@@ -356,7 +378,38 @@ export function SectionPage({
   ).filter((entry): entry is [string, string] => Boolean(entry[1]));
   return (
     <div className={`container inner-page page-${section}`}>
-      <PageHeading label={t.eyebrow} title={title} intro={intros[section]} />
+      {section === 'research' ? (
+        <ResearchShowcase className="research-feature research-graph-dark">
+          <div className="research-feature-copy">
+            <PageHeading
+              label={t.eyebrow}
+              title={title}
+              intro={intros[section]}
+            />
+            <nav className="research-directions" aria-label={t.nav.research}>
+              {research.map((item) => (
+                <a
+                  href={`#${item.id}`}
+                  data-research-id={item.id}
+                  key={item.id}
+                >
+                  <span className="item-number">{item.number}</span>
+                  <span>{item.title[lang]}</span>
+                  <Arrow />
+                </a>
+              ))}
+            </nav>
+          </div>
+          <ResearchGraph
+            items={research.map((item) => ({
+              id: item.id,
+              title: item.title[lang],
+            }))}
+          />
+        </ResearchShowcase>
+      ) : (
+        <PageHeading label={t.eyebrow} title={title} intro={intros[section]} />
+      )}
       {section === 'about' && (
         <>
           <div className="about-grid">
@@ -491,18 +544,27 @@ export function SectionPage({
       )}
       {section === 'experience' && (
         <>
-          <div className="timeline">
-            {experience.map((item) => (
-              <article className="timeline-item" id={item.id} key={item.id}>
-                <div className="timeline-date">{item.date[lang]}</div>
-                <div className="timeline-body">
-                  <p className="eyebrow">{item.type[lang]}</p>
-                  <h2>{item.title[lang]}</h2>
-                  <p>{item.description[lang]}</p>
-                </div>
-              </article>
-            ))}
-          </div>
+          <ExperienceBrowser
+            label={t.nav.experience}
+            items={experience.map((item) => ({
+              id: item.id,
+              date: item.date[lang],
+              title: item.title[lang],
+            }))}
+          >
+            <div className="timeline">
+              {experience.map((item) => (
+                <article className="timeline-item" id={item.id} key={item.id}>
+                  <div className="timeline-date">{item.date[lang]}</div>
+                  <div className="timeline-body">
+                    <p className="eyebrow">{item.type[lang]}</p>
+                    <h2>{item.title[lang]}</h2>
+                    <p>{item.description[lang]}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </ExperienceBrowser>
           <p className="small-note">{t.dateNote}</p>
         </>
       )}
