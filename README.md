@@ -6,7 +6,7 @@ A bilingual academic portfolio for Zhongsheng Luo (罗中圣), an undergraduate 
 
 The repository has been renamed to [Wesweswes7/zhongshengluo06](https://github.com/Wesweswes7/zhongshengluo06). The links above are the new project-site deployment targets; publication and live verification are in progress.
 
-English is the default language. All nine core pages have Chinese counterparts. The redesigned cover uses the original conference photograph and a retouched waterside photograph; the browser controls their framing. The podium photograph is excluded from the cover.
+English is the default language. All nine core pages have Chinese counterparts. The homepage opens with the selected study-space portrait, followed by the original conference photograph and the waterside photograph in the manual carousel. The podium photograph remains excluded from the cover. The homepage network links directly to the three existing research sections; their full content stays on the Research page.
 
 ## Run locally
 
@@ -38,6 +38,8 @@ The production output is in `out/`. The preview server normally uses port 4173. 
 - [Note template](docs/templates/note.md) · [Project template](docs/templates/project.json)
 
 Structured content lives in `data/`; navigation and UI translations live in `messages/`. Long-form notes live in `content/notes/`, and optional project narratives live in `content/projects/`.
+
+The homepage-only default photograph is configured in `data/cover-photo.json`, independently of the About portrait in `data/profile.json`. WebP variants and a JPEG fallback live in `public/images/covers/`. To reproduce the current exports from the supplied 1672×941 source, run `node scripts/prepare-cover-photo.mjs "<source-image-path>"`. This uses the existing Sharp installation and only resizes/encodes at the original aspect ratio; it does not crop, retouch, or upscale. Content validation checks that every configured cover resource exists.
 
 ## Current content
 

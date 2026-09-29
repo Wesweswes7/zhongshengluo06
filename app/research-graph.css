@@ -1,10 +1,13 @@
 /* One deterministic network shared by the full research feature and compact mark. */
-.research-graph {
+.research-graph,
+.research-graph-navigation {
   --graph-surface: var(--color-surface);
   --graph-line: var(--color-primary);
   --graph-node: var(--color-primary-hover);
   --graph-label: var(--color-primary);
   --graph-accent: var(--color-accent);
+}
+.research-graph {
   display: block;
   width: 100%;
   height: auto;
@@ -12,14 +15,20 @@
   pointer-events: none;
   user-select: none;
 }
-.research-graph-dark .research-graph {
+.research-graph-dark .research-graph,
+.research-graph-dark .research-graph-navigation {
   --graph-surface: var(--color-feature-bg);
   --graph-line: var(--color-feature-node);
   --graph-node: var(--color-feature-node);
   --graph-label: var(--color-feature-text);
   --graph-accent: var(--color-feature-accent);
 }
+.home-research-navigation .research-graph,
+.home-research-navigation .research-graph-navigation {
+  --graph-surface: var(--color-cover);
+}
 .research-graph path,
+.research-graph line,
 .research-graph circle {
   vector-effect: non-scaling-stroke;
 }
@@ -105,6 +114,139 @@
 .research-graph--compact {
   max-width: 180px;
 }
+
+/* Navigation uses the same hubs and connections, with ordinary HTML links.
+   Its SVG has percentage coordinates so text and hit areas never shrink. */
+.research-graph-navigation {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  height: 320px;
+  margin-inline: auto;
+  isolation: isolate;
+}
+.research-graph-navigation > .research-graph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.research-node-link {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 24px auto;
+  justify-items: center;
+  gap: 6px;
+  width: min(40%, 220px);
+  min-height: var(--control-size);
+  padding: 10px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  transform: translate(-50%, -23px);
+  color: var(--graph-label);
+  text-align: center;
+  line-height: 1.45;
+}
+.research-node-marker {
+  align-self: center;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--graph-node);
+  border-radius: 50%;
+  background: var(--graph-node);
+}
+.research-node-label {
+  padding: 2px;
+  border-radius: 4px;
+  background: var(--graph-surface);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.research-node-arrow {
+  position: absolute;
+  left: calc(50% + 14px);
+  top: 17px;
+  background: var(--graph-surface);
+}
+.research-node-link:focus-visible {
+  outline: 2px solid var(--graph-node);
+  outline-offset: 3px;
+  background: color-mix(in srgb, var(--graph-node) 10%, transparent);
+}
+.research-node-link:focus-visible .research-node-marker {
+  border-color: var(--graph-accent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--graph-node) 28%, transparent);
+}
+.research-node-link:focus-visible .research-node-label {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.research-graph-navigation:has(
+    .research-node-link[data-research-id='artificial-intelligence']:focus-visible
+  )
+  [data-research-group='artificial-intelligence'],
+.research-graph-navigation:has(
+    .research-node-link[data-research-id='computational-social-science']:focus-visible
+  )
+  [data-research-group='computational-social-science'],
+.research-graph-navigation:has(
+    .research-node-link[data-research-id='ai-governance']:focus-visible
+  )
+  [data-research-group='ai-governance'] {
+  --graph-active: 1;
+  --graph-node-fill: var(--graph-node);
+}
+@media (hover: hover) and (pointer: fine) {
+  .research-node-link:hover {
+    background: color-mix(in srgb, var(--graph-node) 10%, transparent);
+  }
+  .research-node-link:hover .research-node-label {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .research-node-link:hover .research-node-marker {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--graph-node) 28%, transparent);
+  }
+  .research-graph-navigation:not(:has(.research-node-link:focus-visible)):has(
+      .research-node-link[data-research-id='artificial-intelligence']:hover
+    )
+    [data-research-group='artificial-intelligence'],
+  .research-graph-navigation:not(:has(.research-node-link:focus-visible)):has(
+      .research-node-link[data-research-id='computational-social-science']:hover
+    )
+    [data-research-group='computational-social-science'],
+  .research-graph-navigation:not(:has(.research-node-link:focus-visible)):has(
+      .research-node-link[data-research-id='ai-governance']:hover
+    )
+    [data-research-group='ai-governance'] {
+    --graph-active: 1;
+    --graph-node-fill: var(--graph-node);
+  }
+}
+@media (max-width: 1100px) {
+  .research-graph-navigation {
+    max-width: 680px;
+    min-height: 300px;
+    height: 300px;
+  }
+}
+@media (max-width: 640px) {
+  .research-node-label {
+    font-size: 14px;
+  }
+  .research-graph-navigation [data-graph-supplemental] {
+    display: none;
+  }
+}
+@media (max-width: 360px) {
+  .research-node-link,
+  .research-node-label {
+    padding-inline: 0;
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
   .research-graph-group .research-graph-edge,
   .research-graph-group .research-graph-bridge,
@@ -115,5 +257,18 @@
   }
   .research-graph-group .research-graph-node {
     transition: fill var(--duration-press) ease;
+  }
+  .research-node-link {
+    transition:
+      background-color var(--duration-press) ease,
+      scale var(--duration-press) ease;
+  }
+  .research-node-marker {
+    transition:
+      border-color var(--duration-press) ease,
+      box-shadow var(--duration-press) ease;
+  }
+  .research-node-link:active {
+    scale: 0.98;
   }
 }

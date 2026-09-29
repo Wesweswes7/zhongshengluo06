@@ -6,6 +6,7 @@ export type CarouselPhoto = {
   id: string;
   src: string;
   srcSet?: string;
+  sizes?: string;
   alt: string;
   caption: string;
   width: number;
@@ -110,7 +111,7 @@ export function PhotoCarousel({
               <source
                 type="image/webp"
                 srcSet={photo.srcSet}
-                sizes="(max-width: 640px) 100vw, 76vw"
+                sizes={photo.sizes ?? '(max-width: 640px) 100vw, 76vw'}
               />
             )}
             <img
@@ -119,12 +120,41 @@ export function PhotoCarousel({
               width={photo.width}
               height={photo.height}
               fetchPriority={index === 0 ? 'high' : 'auto'}
+              loading="eager"
               decoding="async"
               className={index === 0 ? undefined : 'carousel-added'}
             />
           </picture>
         </div>
       </div>
+      <svg
+        className="cover-network"
+        viewBox="0 0 164 74"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <g className="cover-network-full">
+          <path d="M8 43 31 14 80 28 112 8 156 30 128 60 80 28 53 58 8 43" />
+          {[
+            [8, 43],
+            [31, 14],
+            [53, 58],
+            [112, 8],
+            [128, 60],
+            [156, 30],
+          ].map(([x, y]) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r="3" />
+          ))}
+          <circle className="cover-network-accent" cx="80" cy="28" r="4" />
+        </g>
+        <g className="cover-network-mobile">
+          <path d="M12 24 82 54 148 18" />
+          <circle cx="12" cy="24" r="5" />
+          <circle className="cover-network-accent" cx="82" cy="54" r="5" />
+          <circle cx="148" cy="18" r="5" />
+        </g>
+      </svg>
       {children}
       <figcaption className="cover-bottom container">
         <div className="cover-caption" aria-live="polite" aria-atomic="true">

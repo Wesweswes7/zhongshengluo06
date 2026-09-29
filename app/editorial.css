@@ -1,7 +1,7 @@
 /*
  * Homepage-only composition. Shared typography, controls and responsive tokens
  * come from globals.css; no theme variables or shared component overrides here.
- * Photo sources, cropping and manual carousel behavior are preserved.
+ * Photo sources and manual carousel behavior are preserved.
  */
 .home-cover {
   position: relative;
@@ -12,17 +12,20 @@
   position: relative;
   margin: 0;
   width: 100%;
-  height: clamp(650px, calc(100svh - var(--header-height)), 880px);
+  height: clamp(560px, 42vw, 640px);
 }
-/* Photo pixels begin at 24% on desktop. Keep the pattern inside the dark margin. */
+/* Reuse the original pattern only around the small upper-left network. */
 .home-cover .photo-carousel::before {
   content: '';
   position: absolute;
   z-index: 1;
-  top: 16%;
-  bottom: 16%;
-  left: 0;
-  width: min(24%, 320px);
+  top: var(--space-3);
+  left: max(
+    var(--gutter),
+    calc((100% - var(--content-width)) / 2 + var(--gutter))
+  );
+  width: 184px;
+  height: 96px;
   background-image: radial-gradient(
     circle,
     var(--color-surface) 0.8px,
@@ -42,16 +45,14 @@
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      var(--color-cover) 0%,
-      var(--color-cover) 21%,
-      rgb(var(--cover-rgb) / 90%) 30%,
-      rgb(var(--cover-rgb) / 30%) 55%,
-      rgb(var(--cover-rgb) / 3%) 80%
-    ),
-    linear-gradient(0deg, rgb(var(--cover-rgb) / 70%), transparent 38%);
+  background: linear-gradient(
+    90deg,
+    var(--color-cover) 0%,
+    var(--color-cover) 22%,
+    rgb(var(--cover-rgb) / 90%) 32%,
+    rgb(var(--cover-rgb) / 25%) 44%,
+    transparent 52%
+  );
   pointer-events: none;
 }
 .home-cover .portrait-viewport {
@@ -76,6 +77,24 @@
 .home-cover [data-photo='by-the-water'] img {
   object-position: 50% 38%;
 }
+@media (min-width: 901px) {
+  /* A shorter editorial cover needs the conference portrait aligned higher. */
+  .home-cover [data-photo='in-the-field'] img {
+    object-position: 65% 10%;
+  }
+}
+/* The right-hand image area preserves head and hand without letterboxing.
+   Limit its width on large screens to avoid magnifying this landscape crop. */
+.home-cover [data-photo='study-portrait'] .portrait-viewport img {
+  width: 76%;
+  max-width: calc(640px * 1672 / 941);
+  margin-left: auto;
+  object-fit: cover;
+  object-position: right 20%;
+}
+.home-cover [data-photo='study-portrait'] .portrait-viewport picture {
+  transform: none;
+}
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
   .home-cover .portrait-viewport picture {
     transform: scale(var(--cover-photo-scale, 1));
@@ -88,7 +107,36 @@
   top: 50%;
   left: 0;
   right: 0;
-  transform: translateY(-42%);
+  transform: translateY(-45%);
+}
+.cover-network {
+  position: absolute;
+  z-index: 1;
+  top: var(--space-4);
+  left: max(
+    var(--gutter),
+    calc((100% - var(--content-width)) / 2 + var(--gutter))
+  );
+  width: 164px;
+  height: 74px;
+  pointer-events: none;
+}
+.cover-network path {
+  stroke: var(--color-primary-hover);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+.cover-network circle {
+  fill: var(--color-cover);
+  stroke: var(--color-cover-muted);
+  stroke-width: 1;
+}
+.cover-network .cover-network-accent {
+  fill: var(--color-feature-accent);
+  stroke: var(--color-feature-accent);
+}
+.cover-network-mobile {
+  display: none;
 }
 .cover-eyebrow {
   display: flex;
@@ -109,23 +157,23 @@
   background: var(--color-cover-muted);
 }
 .cover-copy h1 {
-  font-size: var(--text-hero);
+  font-size: clamp(42px, 4.2vw, 62px);
   font-weight: 700;
   line-height: 1.1;
   margin-bottom: var(--space-3);
-  max-width: 670px;
+  max-width: min(42vw, 500px);
   color: var(--color-surface);
 }
 .cover-title {
-  max-width: 560px;
-  font-size: 22px;
+  max-width: min(39vw, 430px);
+  font-size: 20px;
   font-weight: 500;
   color: var(--color-surface);
   line-height: 1.5;
   text-wrap: balance;
 }
 .cover-affiliation {
-  max-width: 560px;
+  max-width: min(38vw, 420px);
   font-size: var(--text-meta);
   color: var(--color-cover-muted);
   margin-top: var(--space-2);
@@ -188,6 +236,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  background: rgb(var(--cover-rgb) / 78%);
+  border-radius: 999px;
 }
 .carousel-controls button {
   display: inline-flex;
@@ -258,7 +308,7 @@
 .focus-strip {
   display: grid;
   align-items: center;
-  grid-template-columns: 1fr 1fr 96px;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border);
@@ -276,11 +326,6 @@
   color: var(--color-text-muted);
   margin-top: var(--space-1);
 }
-.focus-strip > .research-graph {
-  width: 96px;
-  height: 80px;
-  pointer-events: none;
-}
 .home-section {
   padding-block: var(--section-space);
 }
@@ -293,8 +338,21 @@
 }
 
 @media (max-width: 900px) {
-  .home-cover .photo-carousel::before {
+  .home-cover .photo-carousel::before,
+  .cover-network-full {
     display: none;
+  }
+  .cover-network {
+    top: var(--space-2);
+    left: var(--gutter);
+    width: 84px;
+    height: 40px;
+  }
+  .cover-network-mobile {
+    display: block;
+  }
+  .cover-network-mobile path {
+    stroke-width: 2;
   }
   .home-cover .photo-carousel {
     height: 700px;
@@ -302,6 +360,13 @@
   .cover-title {
     max-width: 420px;
     font-size: 20px;
+  }
+  .cover-copy h1 {
+    font-size: var(--text-hero);
+    max-width: 670px;
+  }
+  .cover-affiliation {
+    max-width: 560px;
   }
   .home-introduction {
     gap: var(--space-4);
@@ -311,11 +376,52 @@
     grid-template-columns: 1fr 1fr;
     gap: var(--space-3);
   }
-  .focus-strip > .research-graph {
-    display: none;
+  /* The supplied cover stays fully visible above the text on narrow screens. */
+  .home-cover .photo-carousel[data-photo='study-portrait'] {
+    height: auto;
+  }
+  .home-cover [data-photo='study-portrait'] .portrait-frame {
+    position: relative;
+    inset: auto;
+  }
+  .home-cover [data-photo='study-portrait'] .portrait-viewport,
+  .home-cover [data-photo='study-portrait'] .portrait-viewport picture {
+    height: auto;
+  }
+  .home-cover [data-photo='study-portrait'] .portrait-viewport img {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+  }
+  .home-cover [data-photo='study-portrait'] .portrait-frame::after {
+    background: none;
+  }
+  .home-cover [data-photo='study-portrait'] .cover-copy {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    transform: none;
+    padding-block: var(--space-4) var(--space-3);
+  }
+  .home-cover [data-photo='study-portrait'] .cover-copy h1,
+  .home-cover [data-photo='study-portrait'] .cover-title,
+  .home-cover [data-photo='study-portrait'] .cover-affiliation {
+    max-width: 100%;
+  }
+  .home-cover [data-photo='study-portrait'] .cover-bottom {
+    position: relative;
+    bottom: auto;
+    padding-bottom: var(--space-3);
   }
 }
 @media (max-width: 640px) {
+  /* The conference crop has another face near this corner. Keep it clear. */
+  .home-cover [data-photo='in-the-field'] .cover-network {
+    display: none;
+  }
   .home-cover .photo-carousel {
     height: 690px;
   }

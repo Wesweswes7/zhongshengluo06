@@ -13,12 +13,11 @@ export function ReadingMotion() {
 
       const elements = Array.from(
         document.querySelectorAll<HTMLElement>(
-          '.research-card, ' +
-            '.research-feature .page-heading, .research-detail, .experience-browser .timeline-item',
+          '.research-feature .page-heading, .research-detail, .experience-browser .timeline-item',
         ),
       );
       const homeHeading = document.querySelector<HTMLElement>(
-        '.research-overview .section-heading',
+        '.home-research-navigation .section-heading',
       );
       if (homeHeading) elements.unshift(homeHeading);
       if (!elements.length) return;

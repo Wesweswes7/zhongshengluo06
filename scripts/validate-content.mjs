@@ -63,6 +63,46 @@ for (const item of [profile.photo, ...Object.values(profile.cv)].filter(
     `Missing public asset: ${item}`,
   );
 const categories = read('categories');
+const cover = read('cover-photo');
+assert(slugPattern.test(cover.id ?? ''), 'Cover: stable ID required');
+for (const key of ['alt', 'caption'])
+  assert(localized(cover[key]), `Cover: bilingual ${key} required`);
+assert(
+  Number.isInteger(cover.width) &&
+    cover.width > 0 &&
+    Number.isInteger(cover.height) &&
+    cover.height > 0,
+  'Cover: positive original dimensions required',
+);
+assert(
+  typeof cover.image === 'string' &&
+    /^\/images\/covers\/[a-z0-9-]+$/.test(cover.image),
+  'Cover: invalid image prefix',
+);
+assert(
+  typeof cover.sizes === 'string' && cover.sizes.trim(),
+  'Cover: responsive sizes required',
+);
+assert(
+  Array.isArray(cover.responsiveWidths) &&
+    cover.responsiveWidths.length > 0 &&
+    cover.responsiveWidths.every(
+      (width, index, widths) =>
+        Number.isInteger(width) &&
+        width > 0 &&
+        width <= cover.width &&
+        (index === 0 || width > widths[index - 1]),
+    ),
+  'Cover: responsive widths must be ascending and must not upscale the source',
+);
+for (const suffix of [
+  '.jpg',
+  ...(cover.responsiveWidths ?? []).map((width) => `-${width}.webp`),
+])
+  assert(
+    fs.existsSync(path.join(root, 'public', `${cover.image}${suffix}`)),
+    `Cover: missing ${suffix} asset`,
+  );
 const photoSlugs = new Set();
 for (const photo of read('photos')) {
   assert(

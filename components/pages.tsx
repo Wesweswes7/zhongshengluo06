@@ -9,6 +9,7 @@ import awards from '@/data/awards.json';
 import categories from '@/data/categories.json';
 import publications from '@/data/publications.json';
 import photos from '@/data/photos.json';
+import coverPhoto from '@/data/cover-photo.json';
 import { PhotoCarousel } from './photo-carousel';
 import { ExperienceBrowser } from './experience-browser';
 import { ResearchGraph, ResearchShowcase } from './research-graph';
@@ -31,7 +32,6 @@ import {
 import {
   Arrow,
   CV,
-  ResearchIcon,
   ContactStrip,
   EmptyState,
   PageHeading,
@@ -39,31 +39,6 @@ import {
   TextLink,
 } from './ui';
 
-function ResearchCards({ lang }: { lang: Locale }) {
-  return (
-    <div className="research-grid">
-      {research.map((item) => (
-        <Link
-          className="research-card"
-          data-research-id={item.id}
-          href={`${route(lang, 'research')}#${item.id}`}
-          key={item.id}
-        >
-          <div className="research-card-top">
-            <ResearchIcon id={item.id} />
-            <span className="item-number">{item.number}</span>
-          </div>
-          <h3>{item.title[lang]}</h3>
-          <p>{item.description[lang]}</p>
-          <span className="card-bottom">
-            {item.short[lang]}
-            <Arrow />
-          </span>
-        </Link>
-      ))}
-    </div>
-  );
-}
 function LearningCards({
   lang,
   full = false,
@@ -178,6 +153,21 @@ export function HomePage({ lang }: { lang: Locale }) {
           lang={lang}
           photos={[
             {
+              id: coverPhoto.id,
+              src: asset(`${coverPhoto.image}.jpg`),
+              srcSet: coverPhoto.responsiveWidths
+                .map(
+                  (width) =>
+                    `${asset(`${coverPhoto.image}-${width}.webp`)} ${width}w`,
+                )
+                .join(', '),
+              sizes: coverPhoto.sizes,
+              alt: coverPhoto.alt[lang],
+              caption: coverPhoto.caption[lang],
+              width: coverPhoto.width,
+              height: coverPhoto.height,
+            },
+            {
               id: 'in-the-field',
               src: asset(profile.photo),
               alt: profile.photoAlt[lang],
@@ -233,6 +223,25 @@ export function HomePage({ lang }: { lang: Locale }) {
           </div>
         </PhotoCarousel>
       </section>
+      <section className="home-research-section container">
+        <div className="home-research-navigation research-graph-dark">
+          <SectionHeading
+            label={t.researchLabel}
+            title={t.researchHeading}
+            href={route(lang, 'research')}
+            link={t.allResearch}
+          />
+          <ResearchGraph
+            navigation
+            label={t.nav.research}
+            items={research.map((item) => ({
+              id: item.id,
+              title: item.title[lang],
+              href: asset(`${route(lang, 'research')}#${item.id}`),
+            }))}
+          />
+        </div>
+      </section>
       <section className="home-introduction container">
         <div>
           <p className="eyebrow">
@@ -250,7 +259,7 @@ export function HomePage({ lang }: { lang: Locale }) {
           <p>{profile.interestsIntro[lang]}</p>
         </div>
       </section>
-      <div className="container">
+      <div className="home-focus container">
         <div className="focus-strip">
           <div>
             <p className="eyebrow">{t.currently}</p>
@@ -260,34 +269,8 @@ export function HomePage({ lang }: { lang: Locale }) {
             <p className="eyebrow">{t.next}</p>
             <p>{profile.next[lang]}</p>
           </div>
-          <ResearchGraph
-            compact
-            items={research.map((item) => ({
-              id: item.id,
-              title: item.title[lang],
-            }))}
-          />
         </div>
       </div>
-      <section className="home-section container">
-        <ResearchShowcase className="home-research">
-          <div className="research-overview">
-            <SectionHeading
-              label={t.researchLabel}
-              title={t.researchHeading}
-              href={route(lang, 'research')}
-              link={t.allResearch}
-            />
-            <ResearchGraph
-              items={research.map((item) => ({
-                id: item.id,
-                title: item.title[lang],
-              }))}
-            />
-          </div>
-          <ResearchCards lang={lang} />
-        </ResearchShowcase>
-      </section>
       <section className="learning-band">
         <div className="home-section container">
           <SectionHeading
